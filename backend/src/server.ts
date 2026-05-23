@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response} from 'express';
 import express, { type Application } from 'express';
 import mongoose from 'mongoose';
 
-import { env } from './config/env';
+import { env } from './config/env.js';
 
 const app: Application = express();
 const PORT = env.PORT;
