@@ -69,12 +69,6 @@ export default [
       // quality
       eqeqeq: ['error', 'always'],
       curly: ['error', 'all'],
-      'no-console': [
-        'warn',
-        {
-          allow: ['warn', 'error'],
-        },
-      ],
     },
   },
 ];
