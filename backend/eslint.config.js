@@ -1,8 +1,8 @@
 import js from '@eslint/js';
-import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default [
   js.configs.recommended,
@@ -11,13 +11,13 @@ export default [
 
   {
     files: ['**/*.ts'],
+
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
         project: './tsconfig.json',
         sourceType: 'module',
       },
-
       globals: {
         ...globals.node,
       },
@@ -32,17 +32,20 @@ export default [
       semi: ['error', 'always'],
       quotes: ['error', 'single'],
       indent: ['error', 2],
+      'object-curly-spacing': ['error', 'always'],
+      'eol-last': ['error', 'always'],
       'comma-dangle': ['error', 'always-multiline'],
 
-      // ts
+      // TypeScript
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
           argsIgnorePattern: '^_',
         },
       ],
-
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-inferrable-types': 'off',
 
       // imports
       'import/order': [
@@ -56,9 +59,7 @@ export default [
             'sibling',
             'index',
           ],
-
           'newlines-between': 'always',
-
           alphabetize: {
             order: 'asc',
             caseInsensitive: true,
