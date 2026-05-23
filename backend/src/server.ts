@@ -1,4 +1,4 @@
-import type { NextFunction, Request, Response} from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import express, { type Application } from 'express';
 import mongoose from 'mongoose';
 
