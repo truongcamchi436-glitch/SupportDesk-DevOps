@@ -7,8 +7,10 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "test": "NODE_ENV=test jest --forceExit",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier . --write"
