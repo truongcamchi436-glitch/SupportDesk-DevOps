@@ -50,7 +50,7 @@ export const login = async (email: string, password: string) => {
   return { user, token };
 };
 
-const generateToken = async (user: IUser) => {
+const generateToken = (user: IUser) => {
   return jwt.sign(
     { 
       id: user._id, 
