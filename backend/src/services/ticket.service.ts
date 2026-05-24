@@ -67,6 +67,7 @@ export const assignTicketToMe = async (id: string, agentId: string) => {
   }
 
   ticket.assignedTo = new Types.ObjectId(agentId);
+  ticket.status = 'in_progress';
   await ticket.save();
 
   return ticket;
