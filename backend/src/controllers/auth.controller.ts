@@ -28,9 +28,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     );
 
     res.status(201).json(result);
-  } catch (error) {
-    next(error);
-  }  
+  } catch (error) { next(error); }  
 };
 
 export const login = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,7 +38,5 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     const result = await authService.login(data.email, data.password);
     
     res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
+  } catch (error) { next(error); }
 };
