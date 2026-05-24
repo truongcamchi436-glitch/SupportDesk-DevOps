@@ -1,6 +1,11 @@
 FROM node:20-alpine
+
 WORKDIR /app
+
 COPY package*.json ./
+
 RUN npm install
+
 COPY . .
-CMD ["npx", "ts-node-dev", "--respawn", "--transpile-only", "src/server.ts"]
+
+CMD ["npx", "tsx", "watch", "src/server.ts"]
