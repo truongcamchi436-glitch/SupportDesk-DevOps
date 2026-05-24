@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 
 import { env } from './config/env.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
+import router from './routes/index.route.js';
 
 const app: Application = express();
 const PORT = env.PORT;
@@ -13,6 +14,8 @@ app.use(express.json());
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
 });
+
+app.use(router);
 
 app.use(errorMiddleware);
 
