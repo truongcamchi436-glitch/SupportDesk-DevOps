@@ -3,6 +3,7 @@ import express, { type Application } from 'express';
 import mongoose from 'mongoose';
 
 import { env } from './config/env.js';
+import { errorMiddleware } from './middlewares/error.middleware.js';
 
 const app: Application = express();
 const PORT = env.PORT;
@@ -13,10 +14,7 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
 });
 
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ message: err.message || 'Internal Server Error' });
-});
+app.use(errorMiddleware);
 
 const start = async () => {
   try {
