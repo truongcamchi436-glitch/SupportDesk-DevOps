@@ -1,7 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { ZodError } from 'zod';
 
 import { AppError } from '../utils/AppError.js';
+
 
 export function errorMiddleware(
   error: Error,
@@ -13,6 +15,17 @@ export function errorMiddleware(
     return res.status(error.statusCode).json({
       message: error.message,
       code: error.code,
+    });
+  }
+
+  if (error instanceof ZodError) {
+    return res.status(400).json({
+      message: 'Validation error',
+      code: 'VALIDATION_ERROR',
+      errors: error.issues.map((issue) => ({
+        field: issue.path.join('.'),
+        code: issue.code,
+      })),
     });
   }
 
