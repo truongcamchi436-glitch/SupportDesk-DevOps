@@ -1,23 +1,9 @@
-import type { NextFunction, Request, Response } from 'express';
-import express, { type Application } from 'express';
 import mongoose from 'mongoose';
 
+import app from './app.js';
 import { env } from './config/env.js';
-import { errorMiddleware } from './middlewares/error.middleware.js';
-import router from './routes/index.route.js';
 
-const app: Application = express();
 const PORT = env.PORT;
-
-app.use(express.json());
-
-app.get('/health', (_req: Request, res: Response) => {
-  res.json({ status: 'ok', db: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
-});
-
-app.use(router);
-
-app.use(errorMiddleware);
 
 const start = async () => {
   try {
@@ -34,5 +20,3 @@ const start = async () => {
 };
 
 start();
-
-export default app;
