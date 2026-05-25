@@ -2,7 +2,10 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": ".",
-    "types": ["node", "jest"]
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "types": ["node", "jest"],
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src", "tests"]
 }

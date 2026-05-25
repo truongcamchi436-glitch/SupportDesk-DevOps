@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "test": "NODE_ENV=test jest --forceExit",
+    "test": "cross-env NODE_ENV=test jest --forceExit",
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint .",
@@ -36,6 +36,7 @@
     "@types/mongoose": "^5.11.96",
     "@types/node": "^25.9.1",
     "@types/supertest": "^7.2.0",
+    "cross-env": "^10.1.0",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
