@@ -5,13 +5,6 @@ import { Ticket } from '../models/Ticket.js';
 import { AppError } from '../utils/AppError.js';
 
 type TicketPriority = 'low' | 'medium' | 'high';
-type TicketStatus = 'open' | 'in_progress' | 'closed';
-
-const allowedTransitions: Record<TicketStatus, TicketStatus[]> = {
-  open: ['in_progress'],
-  in_progress: ['open', 'closed'],
-  closed: [],
-};
 
 export const listTickets = (user: JwtPayload) => {
   const filter = user.role === 'client' ? { createdBy: user.id } : {};
@@ -30,7 +23,7 @@ export const getTicket = async (id: string, user: JwtPayload) => {
   if (!ticket) {throw new AppError('Ticket not found', 404, 'TICKET_NOT_FOUND');}
 
   if (user.role === 'client' && ticket.createdBy._id.toString() !== user.id) {
-    throw new AppError('Access denied', 404, 'ACCESS_DENIED');
+    throw new AppError('Access denied', 403, 'ACCESS_DENIED');
   }
 
   return ticket;
@@ -40,34 +33,75 @@ export const createTicket = (data: { title: string; description: string; priorit
   return Ticket.create({ ...data, createdBy: userId });
 };
 
-export const updateStatus = async (id: string, status: TicketStatus) => {
+export const assignTicketToMe = async (id: string, agentId: string) => {
   const ticket = await findTicketOrFail(id);
 
-  const currentStatus = ticket.status;
-
-  if (!allowedTransitions[currentStatus].includes(status)) {
-    throw new AppError(
-      `Cannot change status from ${currentStatus} to ${status}`,
-      400,
-      'INVALID_STATUS_TRANSITION',
-    );
+  if (ticket.status !== 'open') {
+    throw new AppError('Only open tickets can be assigned', 400, 'TICKET_NOT_OPEN');
   }
 
-  ticket.status = status;
+  ticket.assignedTo = new Types.ObjectId(agentId);
+  ticket.status = 'in_progress';
+
   await ticket.save();
 
   return ticket;
 };
 
-export const assignTicketToMe = async (id: string, agentId: string) => {
+export const unassignTicket = async (id: string, agentId: string) => {
   const ticket = await findTicketOrFail(id);
 
-  if (ticket.status !== 'open') {
-    throw new AppError('Only open tickets can perform this action', 400, 'TICKET_NOT_OPEN');
+  if (ticket.status !== 'in_progress') {
+    throw new AppError(
+      'Only in progress tickets can be unassigned',
+      400,
+      'TICKET_NOT_IN_PROGRESS',
+    );
   }
 
-  ticket.assignedTo = new Types.ObjectId(agentId);
-  ticket.status = 'in_progress';
+  if (ticket.assignedTo?.toString() !== agentId) {
+    throw new AppError('Access denied', 403, 'ACCESS_DENIED');
+  }
+
+  ticket.assignedTo = null;
+  ticket.status = 'open';
+
+  await ticket.save();
+
+  return ticket;
+};
+
+export const closeTicket = async (id: string, agentId: string) => {
+  const ticket = await findTicketOrFail(id);
+
+  if (ticket.status !== 'in_progress') {
+    throw new AppError('Only in progress tickets can be closed', 400, 'TICKET_NOT_IN_PROGRESS');
+  }
+
+  if (ticket.assignedTo?.toString() !== agentId) {
+    throw new AppError('Access denied', 403, 'ACCESS_DENIED');
+  }
+
+  ticket.status = 'closed';
+
+  await ticket.save();
+
+  return ticket;
+};
+
+export const cancelTicket = async (id: string, user: JwtPayload) => {
+  const ticket = await findTicketOrFail(id);
+
+  if (user.role !== 'client' || ticket.createdBy.toString() !== user.id) {
+    throw new AppError('Access denied', 403, 'ACCESS_DENIED');
+  }
+
+  if (ticket.status !== 'open') {
+    throw new AppError('Only open tickets can be canceled', 400, 'TICKET_NOT_OPEN');
+  }
+
+  ticket.status = 'canceled';
+
   await ticket.save();
 
   return ticket;
