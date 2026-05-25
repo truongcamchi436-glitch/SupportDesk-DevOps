@@ -9,10 +9,15 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', ticketController.list);
-router.post('/', requireRole('client'), ticketController.create);
 router.get('/:id', ticketController.get);
-router.patch('/:id/status', requireRole('agent'), ticketController.updateStatus);
+
+router.post('/', requireRole('client'), ticketController.create);
+
 router.patch('/:id/assign', requireRole('agent'), ticketController.assign);
+router.patch('/:id/unassign', requireRole('agent'), ticketController.unassign);
+router.patch('/:id/close', requireRole('agent'), ticketController.close);
+router.patch('/:id/cancel', requireRole('client'), ticketController.cancel);
+
 router.post('/:id/comments', ticketController.comment);
 
 export default router;
