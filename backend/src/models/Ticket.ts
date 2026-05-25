@@ -29,7 +29,7 @@ const ticketSchema = new Schema<ITicket>(
   {
     title:       { type: String, required: true, trim: true },
     description: { type: String, required: true },
-    status:      { type: String, enum: ['open', 'in_progress', 'closed'], default: 'open' },
+    status:      { type: String, enum: ['open', 'in_progress', 'closed', 'canceled'], default: 'open' },
     priority:    { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
     createdBy:   { type: Schema.Types.ObjectId, ref: 'User', required: true },
     assignedTo:  { type: Schema.Types.ObjectId, ref: 'User', default: null },
