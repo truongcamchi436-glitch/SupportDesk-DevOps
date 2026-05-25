@@ -13,10 +13,6 @@ const createTicketSchema = z.object({
   priority: z.enum(['low', 'medium', 'high']).optional(),
 });
 
-const updateStatusSchema = z.object({
-  status: z.enum(['open', 'in_progress', 'closed']),
-});
-
 const commentSchema = z.object({
   body: z.string().trim().min(1),
 });
@@ -58,22 +54,41 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
   } catch (error) { next(error); }
 };
 
-export const updateStatus = async (req: Request<TicketParams>, res: Response, next: NextFunction) => {
-  try {
-    const { id } = ticketParamsSchema.parse(req.params);
-    const { status } = updateStatusSchema.parse(req.body);
-
-    const ticket = await ticketService.updateStatus(id, status);
-
-    res.json(ticket);
-  } catch (error) { next(error); }
-};
-
 export const assign = async (req: Request<TicketParams>, res: Response, next: NextFunction) => {
   try {
     const { id } = ticketParamsSchema.parse(req.params);
 
     const ticket = await ticketService.assignTicketToMe(id, req.user!.id);
+
+    res.json(ticket);
+  } catch (error) { next(error); }
+};
+
+export const unassign = async (req: Request<TicketParams>, res: Response, next: NextFunction) => {
+  try {
+    const { id } = ticketParamsSchema.parse(req.params);
+
+    const ticket = await ticketService.unassignTicket(id, req.user!.id);
+
+    res.json(ticket);
+  } catch (error) { next(error); }
+};
+
+export const close = async (req: Request<TicketParams>, res: Response, next: NextFunction) => {
+  try {
+    const { id } = ticketParamsSchema.parse(req.params);
+
+    const ticket = await ticketService.closeTicket(id, req.user!.id);
+
+    res.json(ticket);
+  } catch (error) { next(error); }
+};
+
+export const cancel = async (req: Request<TicketParams>, res: Response, next: NextFunction) => {
+  try {
+    const { id } = ticketParamsSchema.parse(req.params);
+
+    const ticket = await ticketService.cancelTicket(id, req.user!);
 
     res.json(ticket);
   } catch (error) { next(error); }
