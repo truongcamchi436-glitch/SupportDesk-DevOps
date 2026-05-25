@@ -84,7 +84,7 @@ export const close = async (req: Request<TicketParams>, res: Response, next: Nex
   } catch (error) { next(error); }
 };
 
-export const cancel = async (req: Request<TicketParams>, res: Response, next: NextFunction) => {
+export const cancel = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { id } = ticketParamsSchema.parse(req.params);
 
