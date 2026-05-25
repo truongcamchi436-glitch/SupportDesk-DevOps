@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
 import mongoose from 'mongoose';
 import request from 'supertest';
 
@@ -5,6 +6,7 @@ import app from '../src/server.js';
 
 let clientToken: string;
 let agentToken: string;
+let otherAgentToken: string;
 let otherClientToken: string;
 let ticketId: string;
 
@@ -47,6 +49,17 @@ beforeEach(async () => {
     });
 
   agentToken = agent.body.token;
+
+  const otherAgent = await request(app)
+    .post('/auth/register')
+    .send({
+      name: 'Other Agent',
+      email: 'other-agent@test.com',
+      password: '123456',
+      role: 'agent',
+    });
+
+  otherAgentToken = otherAgent.body.token;
 
   const ticket = await request(app)
     .post('/tickets')
@@ -128,31 +141,80 @@ describe('Tickets', () => {
     expect(response.body.status).toBe('in_progress');
   });
 
-  it('should allow assigned agent to close ticket', async () => {
+  it('should not assign a ticket as client', async () => {
+    const response = await request(app)
+      .patch(`/tickets/${ticketId}/assign`)
+      .set('Authorization', `Bearer ${clientToken}`);
+
+    expect(response.status).toBe(403);
+  });
+
+  it('should unassign own assigned ticket as agent', async () => {
     await request(app)
       .patch(`/tickets/${ticketId}/assign`)
       .set('Authorization', `Bearer ${agentToken}`);
 
     const response = await request(app)
-      .patch(`/tickets/${ticketId}/status`)
-      .set('Authorization', `Bearer ${agentToken}`)
-      .send({
-        status: 'closed',
-      });
+      .patch(`/tickets/${ticketId}/unassign`)
+      .set('Authorization', `Bearer ${agentToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.assignedTo).toBeNull();
+    expect(response.body.status).toBe('open');
+  });
+
+  it('should not allow another agent to unassign a ticket they are not assigned to', async () => {
+    await request(app)
+      .patch(`/tickets/${ticketId}/assign`)
+      .set('Authorization', `Bearer ${agentToken}`);
+
+    const response = await request(app)
+      .patch(`/tickets/${ticketId}/unassign`)
+      .set('Authorization', `Bearer ${otherAgentToken}`);
+
+    expect(response.status).toBe(403);
+  });
+
+  it('should close own assigned ticket as agent', async () => {
+    await request(app)
+      .patch(`/tickets/${ticketId}/assign`)
+      .set('Authorization', `Bearer ${agentToken}`);
+
+    const response = await request(app)
+      .patch(`/tickets/${ticketId}/close`)
+      .set('Authorization', `Bearer ${agentToken}`);
 
     expect(response.status).toBe(200);
     expect(response.body.status).toBe('closed');
   });
 
-  it('should not allow invalid status transition from open to closed', async () => {
-    const response = await request(app)
-      .patch(`/tickets/${ticketId}/status`)
-      .set('Authorization', `Bearer ${agentToken}`)
-      .send({
-        status: 'closed',
-      });
+  it('should not allow another agent to close a ticket they are not assigned to', async () => {
+    await request(app)
+      .patch(`/tickets/${ticketId}/assign`)
+      .set('Authorization', `Bearer ${agentToken}`);
 
-    expect(response.status).toBe(400);
+    const response = await request(app)
+      .patch(`/tickets/${ticketId}/close`)
+      .set('Authorization', `Bearer ${otherAgentToken}`);
+
+    expect(response.status).toBe(403);
+  });
+
+  it('should cancel own open ticket as client', async () => {
+    const response = await request(app)
+      .patch(`/tickets/${ticketId}/cancel`)
+      .set('Authorization', `Bearer ${clientToken}`);
+
+    expect(response.status).toBe(200);
+    expect(response.body.status).toBe('canceled');
+  });
+
+  it('should not allow another client to cancel a ticket they did not create', async () => {
+    const response = await request(app)
+      .patch(`/tickets/${ticketId}/cancel`)
+      .set('Authorization', `Bearer ${otherClientToken}`);
+
+    expect(response.status).toBe(403);
   });
 
   it('should allow client to comment on own open ticket', async () => {
@@ -167,17 +229,30 @@ describe('Tickets', () => {
     expect(response.body.comments).toHaveLength(1);
   });
 
+  it('should allow assigned agent to comment on assigned ticket', async () => {
+    await request(app)
+      .patch(`/tickets/${ticketId}/assign`)
+      .set('Authorization', `Bearer ${agentToken}`);
+
+    const response = await request(app)
+      .post(`/tickets/${ticketId}/comments`)
+      .set('Authorization', `Bearer ${agentToken}`)
+      .send({
+        body: 'I am checking this issue',
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body.comments).toHaveLength(1);
+  });
+
   it('should not allow comment on closed ticket', async () => {
     await request(app)
       .patch(`/tickets/${ticketId}/assign`)
       .set('Authorization', `Bearer ${agentToken}`);
 
     await request(app)
-      .patch(`/tickets/${ticketId}/status`)
-      .set('Authorization', `Bearer ${agentToken}`)
-      .send({
-        status: 'closed',
-      });
+      .patch(`/tickets/${ticketId}/close`)
+      .set('Authorization', `Bearer ${agentToken}`);
 
     const response = await request(app)
       .post(`/tickets/${ticketId}/comments`)
