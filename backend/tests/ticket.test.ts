@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from '@jest/glo
 import mongoose from 'mongoose';
 import request from 'supertest';
 
-import app from '../src/server.js';
+import app from '../src/app';
 
 let clientToken: string;
 let agentToken: string;
