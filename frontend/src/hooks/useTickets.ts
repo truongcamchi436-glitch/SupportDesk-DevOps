@@ -3,14 +3,14 @@ import { addComment, assignTicket, cancelTicket, closeTicket, createTicket, getT
 
 const invalidateBoth = (qc: ReturnType<typeof useQueryClient>, id?: string) => {
   qc.invalidateQueries({ queryKey: ['tickets'] })
-  if (id) qc.invalidateQueries({ queryKey: ['tickets', id] })
+  if (id) qc.invalidateQueries({ queryKey: ['ticket', id] })
 }
 
 export const useTickets = () =>
   useQuery({ queryKey: ['tickets'], queryFn: getTickets })
 
 export const useTicket = (id: string) => 
-  useQuery({ queryKey: ['ticket'], queryFn: () => getTicket(id), enabled: !!id })
+  useQuery({ queryKey: ['ticket', id], queryFn: () => getTicket(id), enabled: !!id })
 
 export const useCreateTicket = () => {
   const qc = useQueryClient()
