@@ -1,5 +1,6 @@
 import styled, { useTheme } from 'styled-components'
 import type { Ticket, TicketPriority, TicketStatus } from '../api/tickets'
+import { TICKET_PRIORITY_LABEL, TICKET_STATUS_LABEL } from '../constants/enums'
 import { Card, Badge } from './ui'
 import type { ThemeColors } from '../styles/global'
 
@@ -20,16 +21,16 @@ export const TicketCard = ({ ticket, onClick }: { ticket: Ticket; onClick: () =>
   const theme = useTheme() as ThemeColors
 
   const statusMeta: Record<TicketStatus, { label: string; color: string }> = {
-    open:        { label: 'Aberto',       color: theme.accentInfo },
-    in_progress: { label: 'Em andamento', color: theme.accentWarning },
-    closed:      { label: 'Fechado',      color: theme.accentSuccess },
-    canceled:    { label: 'Cancelado',    color: theme.textMuted },
+    open:        { label: TICKET_STATUS_LABEL.open,        color: theme.accentInfo },
+    in_progress: { label: TICKET_STATUS_LABEL.in_progress, color: theme.accentWarning },
+    closed:      { label: TICKET_STATUS_LABEL.closed,      color: theme.accentSuccess },
+    canceled:    { label: TICKET_STATUS_LABEL.canceled,    color: theme.textMuted },
   }
 
   const priorityMeta: Record<TicketPriority, { label: string; color: string }> = {
-    low:    { label: 'Baixa', color: theme.textMuted },
-    medium: { label: 'Média', color: theme.accentWarning },
-    high:   { label: 'Alta',  color: theme.accentDanger },
+    low:    { label: TICKET_PRIORITY_LABEL.low,    color: theme.textMuted },
+    medium: { label: TICKET_PRIORITY_LABEL.medium, color: theme.accentWarning },
+    high:   { label: TICKET_PRIORITY_LABEL.high,   color: theme.accentDanger },
   }
 
   const s = statusMeta[ticket.status]

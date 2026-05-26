@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import styled, { useTheme } from 'styled-components'
 import { useTicket, useAssignTicket, useUnassignTicket, useCloseTicket, useCancelTicket, useAddComment } from '../hooks/useTickets'
+import { TICKET_STATUS_LABEL } from '../constants/enums'
 import { Button, Textarea, Divider } from './ui'
 import type { ThemeColors } from '../styles/global'
 
@@ -61,7 +62,7 @@ export const TicketDetail = ({ id, onBack }: { id: string; onBack: () => void })
       <p style={{ fontSize: '0.8rem', color: theme.textMuted }}>
         por {ticket.createdBy.name}
         {ticket.assignedTo ? ` · agente: ${ticket.assignedTo.name}` : ''}
-        {' · status: '}<strong>{ticket.status.replace('_', ' ')}</strong>
+        {' · status: '}<strong>{TICKET_STATUS_LABEL[ticket.status]}</strong>
       </p>
 
       <ActionsRow>
@@ -115,6 +116,7 @@ export const TicketDetail = ({ id, onBack }: { id: string; onBack: () => void })
       {canComment && (
         <>
           <Textarea
+            style={{ marginTop: '0.7rem' }}
             placeholder="Adicionar comentário..."
             value={comment}
             onChange={e => setComment(e.target.value)}

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
+import { USER_ROLE_LABEL } from '../constants/enums'
 import type { ThemeColors } from '../styles/global'
 
 const SidebarContainer = styled.aside<{ $open: boolean; theme: ThemeColors }>`
@@ -232,7 +233,7 @@ export const AppLayout = ({ children }: Props) => {
     ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
 
-  const roleLabel = user?.role === 'agent' ? 'Agente' : 'Cliente'
+  const roleLabel = USER_ROLE_LABEL[user?.role ?? 'client']
 
   return (
     <>
