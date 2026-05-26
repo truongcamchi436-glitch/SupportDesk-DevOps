@@ -11,3 +11,20 @@ api.interceptors.request.use((config) => {
 
   return config
 })
+
+let onUnauthorized: (() => void) | null = null
+
+export const setOnUnauthorized = (handler: () => void) => {
+  onUnauthorized = handler
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.clear()
+      if (onUnauthorized) onUnauthorized()
+    }
+    return Promise.reject(error)
+  },
+)
