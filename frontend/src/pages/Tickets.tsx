@@ -110,7 +110,7 @@ const statusFilters: { value: TicketStatus | 'all'; label: string }[] = [
 ]
 
 const priorityFilters: { value: TicketPriority | 'all'; label: string }[] = [
-  { value: 'all', label: 'Prioridade' },
+  { value: 'all', label: 'Todas prioridades' },
   { value: 'high', label: 'Alta' },
   { value: 'medium', label: 'Média' },
   { value: 'low', label: 'Baixa' },

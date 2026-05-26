@@ -91,7 +91,7 @@ export const TicketDetail = ({ id, onBack }: { id: string; onBack: () => void })
 
         {(isClosed || isCanceled) && (
           <span style={{ fontSize: '0.85rem', color: theme.textMuted, alignSelf: 'center' }}>
-            Ticket {isClosed ? 'fechado' : 'cancelado'} — somente leitura
+            Ticket {isClosed ? 'fechado' : 'cancelado'} (somente leitura)
           </span>
         )}
       </ActionsRow>

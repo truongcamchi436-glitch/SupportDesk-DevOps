@@ -222,8 +222,8 @@ export const Register = () => {
               value={role}
               onChange={e => setRole(e.target.value as 'client' | 'agent')}
             >
-              <option value="client">Cliente — Abrir tickets de suporte</option>
-              <option value="agent">Agente — Atender tickets</option>
+              <option value="client">Cliente</option>
+              <option value="agent">Agente</option>
             </Select>
           </InputGroup>
 
